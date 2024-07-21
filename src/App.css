@@ -16,10 +16,10 @@
 .View {
     font-family: "Courier New", monospace;
     background-color: black;
-    line-height: 1em;
+    line-height: 0.6;
     color: white;
-    height: 500px;
-    width: 500px;
+    height: 52ch;
+    width: 52ch;
     border: none;
     resize: none;
 }
