@@ -6,7 +6,7 @@ import Renderer from './render';
 function App() {
   const [cube, setCube] = useState<string>("");
 
-  let renderer = new Renderer(63, 31);
+  let renderer = new Renderer(52, 28);
 
   useEffect(() => {
     setCube(renderer.buildNextFrame());
