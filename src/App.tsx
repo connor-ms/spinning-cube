@@ -9,17 +9,17 @@ function App() {
   let renderer = new Renderer(52, 28);
 
   useEffect(() => {
-    setCube(renderer.buildNextFrame());
-    //const interval = setInterval(() => setCube(renderer.renderFrame()), 10000);
+    //setCube(renderer.buildNextFrame());
+    const interval = setInterval(() => setCube(renderer.buildNextFrame(5)), 50);
     return () => {
-      //clearInterval(interval);
+      clearInterval(interval);
     };
   }, []);
 
   return (
     <div className="App">
       <header className="App-header">
-        <textarea className="View" placeholder={cube}></textarea>
+        <textarea className="View" value={cube}></textarea>
       </header>
     </div>
   );
