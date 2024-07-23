@@ -1,8 +1,5 @@
 .App {
     text-align: center;
-}
-
-.App-header {
     background-color: #282c34;
     min-height: 100vh;
     display: flex;
@@ -13,14 +10,12 @@
     color: white;
 }
 
-.View {
-    font-family: "Courier New", monospace;
-    background-color: black;
-    line-height: 0.6;
-    font-size: 10px;
-    color: white;
-    height: 75ch;
-    width: 75ch;
-    border: none;
-    resize: none;
+.App-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    width: 100%;
+    max-width: 800px;
 }

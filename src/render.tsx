@@ -1,3 +1,5 @@
+import { Settings } from "./components/Settings";
+
 class Vec2 {
     constructor(public x: number = 0, public y: number = 0) { }
 }
@@ -10,7 +12,10 @@ class Triangle {
     constructor(public v0: Vec3 = new Vec3(), public v1: Vec3 = new Vec3(), public v2: Vec3 = new Vec3()) { }
 }
 
-type mat4x4 = number[][];
+class Matrix {
+    constructor(public arr: number[][]) {
+    }
+}
 
 class Mesh {
     public triangles: Triangle[];
@@ -93,7 +98,7 @@ class Mesh {
 }
 
 export default class Renderer {
-    public projMatrix: mat4x4;
+    public projMatrix: Matrix;
     public theta: number;
     public camera: Vec3;
     private luminance: string;
@@ -105,12 +110,12 @@ export default class Renderer {
         let fAspectRatio = viewWidth / viewHeight;
         let fFovRad = 1.0 / Math.tan(fFov * 0.5 / 180 * Math.PI);
 
-        this.projMatrix = [
+        this.projMatrix = new Matrix([
             [fAspectRatio * fFovRad, 0, 0, 0],
             [0, fFovRad, 0, 0],
             [0, 0, fFar / (fFar - fNear), 1],
             [0, (-fFar * fNear) / (fFar - fNear), 0, 0]
-        ]
+        ]);
 
         this.theta = 0;
         this.camera = new Vec3(0, 0, 0);
@@ -133,32 +138,31 @@ export default class Renderer {
         return grid.map(row => row.join('')).join('\n');
     }
 
-    buildNextFrame(frameCount?: number) {
+    buildNextFrame(frameCount: number, settings: Settings) {
         let grid = this.createGrid(this.viewWidth, this.viewHeight);
 
-        if (frameCount)
-            this.theta += (frameCount % 360) * Math.PI / 180;
+        this.theta += (frameCount % 360) * Math.PI / 180;
 
-        let rotX: mat4x4 = [
+        let rotX = new Matrix([
             [1, 0, 0, 0],
             [0, Math.cos(this.theta), -Math.sin(this.theta), 0],
             [0, Math.sin(this.theta), Math.cos(this.theta), 0],
             [0, 0, 0, 0]
-        ]
+        ]);
 
-        let rotY: mat4x4 = [
+        let rotY = new Matrix([
             [Math.cos(this.theta), 0, Math.sin(this.theta), 0],
             [0, 1, 0, 0],
             [-Math.sin(this.theta), 0, Math.cos(this.theta), 0],
             [0, 0, 0, 0]
-        ]
+        ]);
 
-        let rotZ: mat4x4 = [
+        let rotZ = new Matrix([
             [Math.cos(this.theta), -Math.sin(this.theta), 0, 0],
             [Math.sin(this.theta), Math.cos(this.theta), 0, 0],
             [0, 0, 1, 0],
             [0, 0, 0, 0]
-        ]
+        ]);
 
         let mesh = new Mesh();
 
@@ -261,16 +265,14 @@ export default class Renderer {
             }
         }
 
-
-
         return this.gridToString(grid);
     }
 
-    private matMul(i: Vec3, o: Vec3, m: mat4x4) {
-        o.x = i.x * m[0][0] + i.y * m[1][0] + i.z * m[2][0] + m[3][0];
-        o.y = i.x * m[0][1] + i.y * m[1][1] + i.z * m[2][1] + m[3][1];
-        o.z = i.x * m[0][2] + i.y * m[1][2] + i.z * m[2][2] + m[3][2];
-        let w = i.x * m[0][3] + i.y * m[1][3] + i.z * m[2][3] + m[3][3];
+    private matMul(i: Vec3, o: Vec3, m: Matrix) {
+        o.x = i.x * m.arr[0][0] + i.y * m.arr[1][0] + i.z * m.arr[2][0] + m.arr[3][0];
+        o.y = i.x * m.arr[0][1] + i.y * m.arr[1][1] + i.z * m.arr[2][1] + m.arr[3][1];
+        o.z = i.x * m.arr[0][2] + i.y * m.arr[1][2] + i.z * m.arr[2][2] + m.arr[3][2];
+        let w = i.x * m.arr[0][3] + i.y * m.arr[1][3] + i.z * m.arr[2][3] + m.arr[3][3];
 
         if (w !== 0) {
             o.x /= w; o.y /= w; o.z /= w;

@@ -1,28 +1,23 @@
-import { useEffect } from 'react';
 import { useState } from 'react';
+import View from './components/View';
+import SettingsPanel, { Settings } from './components/Settings';
 import './App.css';
-import Renderer from './render';
 
-function App() {
-  const [cube, setCube] = useState<string>("");
+export default function App() {
+  const [settings, setSettings] = useState<Settings>({
+    setting1: true
+  });
 
-  let renderer = new Renderer(75, 75);
-
-  useEffect(() => {
-    //setCube(renderer.buildNextFrame());
-    const interval = setInterval(() => setCube(renderer.buildNextFrame(5)), 50);
-    return () => {
-      clearInterval(interval);
-    };
-  }, []);
+  const handleSettingsChange = (newSettings: Settings) => {
+    setSettings(newSettings);
+  };
 
   return (
     <div className="App">
       <header className="App-header">
-        <textarea className="View" value={cube}></textarea>
+        <SettingsPanel />
+        <View settings={settings} onSettingsChange={handleSettingsChange} />
       </header>
     </div>
   );
 }
-
-export default App;

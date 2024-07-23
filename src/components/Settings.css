@@ -1,0 +1,7 @@
+.Settings {
+    height: 100px;
+    width: 500px;
+    background-color: green;
+    flex: 1;
+    margin-right: 50px;
+}
