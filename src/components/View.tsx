@@ -3,8 +3,7 @@ import Renderer from "../render";
 import { Settings } from "./Settings";
 import "./View.css"
 
-export default function View({ settings, onSettingsChange }:
-    { settings: Settings, onSettingsChange: (newSettings: Settings) => void }) {
+export default function View({ settings }: { settings: Settings }) {
     const [frame, setFrame] = useState<string>("");
 
     let renderer = new Renderer(75, 75);

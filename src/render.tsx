@@ -122,26 +122,11 @@ export default class Renderer {
         this.luminance = "`.-':_,^=;><+!rc*/z?sLTv)J7(|Fi{C}fI31tlu[neoZ5Yxjya]2ESwqkP6h9d4VpOGbUAKXHm8RD#$Bg0MNWQ%&@"
     }
 
-    private createGrid(width: number, height: number): string[][] {
-        const grid: string[][] = [];
-        for (let y = 0; y < height; y++) {
-            const row: string[] = [];
-            for (let x = 0; x < width; x++) {
-                row.push(' ');
-            }
-            grid.push(row);
-        }
-        return grid;
-    }
-
-    private gridToString(grid: string[][]): string {
-        return grid.map(row => row.join('')).join('\n');
-    }
-
     buildNextFrame(frameCount: number, settings: Settings) {
         let grid = this.createGrid(this.viewWidth, this.viewHeight);
 
-        this.theta += (frameCount % 360) * Math.PI / 180;
+        if (!settings.paused)
+            this.theta += (frameCount % 360) * Math.PI / 180;
 
         let rotX = new Matrix([
             [1, 0, 0, 0],
@@ -266,6 +251,22 @@ export default class Renderer {
         }
 
         return this.gridToString(grid);
+    }
+
+    private createGrid(width: number, height: number): string[][] {
+        const grid: string[][] = [];
+        for (let y = 0; y < height; y++) {
+            const row: string[] = [];
+            for (let x = 0; x < width; x++) {
+                row.push(' ');
+            }
+            grid.push(row);
+        }
+        return grid;
+    }
+
+    private gridToString(grid: string[][]): string {
+        return grid.map(row => row.join('')).join('\n');
     }
 
     private matMul(i: Vec3, o: Vec3, m: Matrix) {

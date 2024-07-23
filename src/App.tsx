@@ -5,7 +5,7 @@ import './App.css';
 
 export default function App() {
   const [settings, setSettings] = useState<Settings>({
-    setting1: true
+    paused: false
   });
 
   const handleSettingsChange = (newSettings: Settings) => {
@@ -15,8 +15,8 @@ export default function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <SettingsPanel />
-        <View settings={settings} onSettingsChange={handleSettingsChange} />
+        <SettingsPanel settings={settings} onSettingsChange={handleSettingsChange} />
+        <View settings={settings} />
       </header>
     </div>
   );
