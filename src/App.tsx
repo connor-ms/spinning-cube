@@ -5,18 +5,20 @@ import './App.css';
 
 export default function App() {
   const [settings, setSettings] = useState<Settings>({
-    paused: false
+    paused: false,
+    thetaX: 0,
+    thetaY: 0,
+    thetaZ: 0,
+    rotationSpeed: 5,
+    frametime: 50,
+    delta: 5
   });
-
-  const handleSettingsChange = (newSettings: Settings) => {
-    setSettings(newSettings);
-  };
 
   return (
     <div className="App">
       <header className="App-header">
-        <SettingsPanel settings={settings} onSettingsChange={handleSettingsChange} />
-        <View settings={settings} />
+        <SettingsPanel settings={settings} setSettings={setSettings} />
+        <View settings={settings} setSettings={setSettings} />
       </header>
     </div>
   );

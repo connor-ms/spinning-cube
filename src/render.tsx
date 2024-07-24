@@ -122,11 +122,17 @@ export default class Renderer {
         this.luminance = "`.-':_,^=;><+!rc*/z?sLTv)J7(|Fi{C}fI31tlu[neoZ5Yxjya]2ESwqkP6h9d4VpOGbUAKXHm8RD#$Bg0MNWQ%&@"
     }
 
-    buildNextFrame(frameCount: number, settings: Settings) {
+    buildNextFrame(frameCount: number, settings: Settings, setSettings: React.Dispatch<React.SetStateAction<Settings>>) {
         let grid = this.createGrid(this.viewWidth, this.viewHeight);
 
-        if (!settings.paused)
+        if (!settings.paused) {
             this.theta += (frameCount % 360) * Math.PI / 180;
+            // Commenting this section out makes the pause button work
+            setSettings({
+                ...settings,
+                thetaX: (this.theta * 180 / Math.PI) % 360
+            });
+        }
 
         let rotX = new Matrix([
             [1, 0, 0, 0],

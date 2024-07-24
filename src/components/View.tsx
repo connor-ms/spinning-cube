@@ -3,13 +3,13 @@ import Renderer from "../render";
 import { Settings } from "./Settings";
 import "./View.css"
 
-export default function View({ settings }: { settings: Settings }) {
+export default function View({ settings, setSettings }: { settings: Settings, setSettings: React.Dispatch<React.SetStateAction<Settings>> }) {
     const [frame, setFrame] = useState<string>("");
 
     let renderer = new Renderer(75, 75);
 
     useEffect(() => {
-        const interval = setInterval(() => setFrame(renderer.buildNextFrame(5, settings)), 50);
+        const interval = setInterval(() => setFrame(renderer.buildNextFrame(5, settings, setSettings)), 50);
         return () => {
             clearInterval(interval);
         };
