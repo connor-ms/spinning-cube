@@ -1,20 +1,19 @@
 import { Settings } from "./components/Settings";
 
 class Vec2 {
-    constructor(public x: number = 0, public y: number = 0) { }
+    constructor(public x: number = 0, public y: number = 0) {}
 }
 
 class Vec3 {
-    constructor(public x: number = 0, public y: number = 0, public z: number = 0) { }
+    constructor(public x: number = 0, public y: number = 0, public z: number = 0) {}
 }
 
 class Triangle {
-    constructor(public v0: Vec3 = new Vec3(), public v1: Vec3 = new Vec3(), public v2: Vec3 = new Vec3()) { }
+    constructor(public v0: Vec3 = new Vec3(), public v1: Vec3 = new Vec3(), public v2: Vec3 = new Vec3()) {}
 }
 
 class Matrix {
-    constructor(public arr: number[][]) {
-    }
+    constructor(public arr: number[][]) {}
 }
 
 class Mesh {
@@ -23,77 +22,29 @@ class Mesh {
     constructor() {
         this.triangles = [
             // Front face
-            new Triangle(
-                new Vec3(-0.5, -0.5, 0.5),
-                new Vec3(0.5, -0.5, 0.5),
-                new Vec3(0.5, 0.5, 0.5)
-            ),
-            new Triangle(
-                new Vec3(-0.5, -0.5, 0.5),
-                new Vec3(0.5, 0.5, 0.5),
-                new Vec3(-0.5, 0.5, 0.5)
-            ),
+            new Triangle(new Vec3(-0.5, -0.5, 0.5), new Vec3(0.5, -0.5, 0.5), new Vec3(0.5, 0.5, 0.5)),
+            new Triangle(new Vec3(-0.5, -0.5, 0.5), new Vec3(0.5, 0.5, 0.5), new Vec3(-0.5, 0.5, 0.5)),
 
             // Back face
-            new Triangle(
-                new Vec3(-0.5, -0.5, -0.5),
-                new Vec3(0.5, 0.5, -0.5),
-                new Vec3(0.5, -0.5, -0.5)
-            ),
-            new Triangle(
-                new Vec3(-0.5, -0.5, -0.5),
-                new Vec3(-0.5, 0.5, -0.5),
-                new Vec3(0.5, 0.5, -0.5)
-            ),
+            new Triangle(new Vec3(-0.5, -0.5, -0.5), new Vec3(0.5, 0.5, -0.5), new Vec3(0.5, -0.5, -0.5)),
+            new Triangle(new Vec3(-0.5, -0.5, -0.5), new Vec3(-0.5, 0.5, -0.5), new Vec3(0.5, 0.5, -0.5)),
 
             // Top face
-            new Triangle(
-                new Vec3(-0.5, 0.5, -0.5),
-                new Vec3(-0.5, 0.5, 0.5),
-                new Vec3(0.5, 0.5, 0.5)
-            ),
-            new Triangle(
-                new Vec3(-0.5, 0.5, -0.5),
-                new Vec3(0.5, 0.5, 0.5),
-                new Vec3(0.5, 0.5, -0.5)
-            ),
+            new Triangle(new Vec3(-0.5, 0.5, -0.5), new Vec3(-0.5, 0.5, 0.5), new Vec3(0.5, 0.5, 0.5)),
+            new Triangle(new Vec3(-0.5, 0.5, -0.5), new Vec3(0.5, 0.5, 0.5), new Vec3(0.5, 0.5, -0.5)),
 
             // Bottom face
-            new Triangle(
-                new Vec3(-0.5, -0.5, -0.5),
-                new Vec3(0.5, -0.5, 0.5),
-                new Vec3(-0.5, -0.5, 0.5)
-            ),
-            new Triangle(
-                new Vec3(-0.5, -0.5, -0.5),
-                new Vec3(0.5, -0.5, -0.5),
-                new Vec3(0.5, -0.5, 0.5)
-            ),
+            new Triangle(new Vec3(-0.5, -0.5, -0.5), new Vec3(0.5, -0.5, 0.5), new Vec3(-0.5, -0.5, 0.5)),
+            new Triangle(new Vec3(-0.5, -0.5, -0.5), new Vec3(0.5, -0.5, -0.5), new Vec3(0.5, -0.5, 0.5)),
 
             // Right face
-            new Triangle(
-                new Vec3(0.5, -0.5, -0.5),
-                new Vec3(0.5, 0.5, 0.5),
-                new Vec3(0.5, -0.5, 0.5)
-            ),
-            new Triangle(
-                new Vec3(0.5, -0.5, -0.5),
-                new Vec3(0.5, 0.5, -0.5),
-                new Vec3(0.5, 0.5, 0.5)
-            ),
+            new Triangle(new Vec3(0.5, -0.5, -0.5), new Vec3(0.5, 0.5, 0.5), new Vec3(0.5, -0.5, 0.5)),
+            new Triangle(new Vec3(0.5, -0.5, -0.5), new Vec3(0.5, 0.5, -0.5), new Vec3(0.5, 0.5, 0.5)),
 
             // Left face
-            new Triangle(
-                new Vec3(-0.5, -0.5, -0.5),
-                new Vec3(-0.5, -0.5, 0.5),
-                new Vec3(-0.5, 0.5, 0.5)
-            ),
-            new Triangle(
-                new Vec3(-0.5, -0.5, -0.5),
-                new Vec3(-0.5, 0.5, 0.5),
-                new Vec3(-0.5, 0.5, -0.5)
-            )
-        ]
+            new Triangle(new Vec3(-0.5, -0.5, -0.5), new Vec3(-0.5, -0.5, 0.5), new Vec3(-0.5, 0.5, 0.5)),
+            new Triangle(new Vec3(-0.5, -0.5, -0.5), new Vec3(-0.5, 0.5, 0.5), new Vec3(-0.5, 0.5, -0.5)),
+        ];
     }
 }
 
@@ -101,6 +52,7 @@ export default class Renderer {
     public projMatrix: Matrix;
     public theta: number;
     public camera: Vec3;
+    public settings: Settings;
     private luminance: string;
 
     constructor(private viewWidth: number, private viewHeight: number) {
@@ -108,51 +60,58 @@ export default class Renderer {
         let fFar = 1000;
         let fFov = 90;
         let fAspectRatio = viewWidth / viewHeight;
-        let fFovRad = 1.0 / Math.tan(fFov * 0.5 / 180 * Math.PI);
+        let fFovRad = 1.0 / Math.tan(((fFov * 0.5) / 180) * Math.PI);
 
         this.projMatrix = new Matrix([
             [fAspectRatio * fFovRad, 0, 0, 0],
             [0, fFovRad, 0, 0],
             [0, 0, fFar / (fFar - fNear), 1],
-            [0, (-fFar * fNear) / (fFar - fNear), 0, 0]
+            [0, (-fFar * fNear) / (fFar - fNear), 0, 0],
         ]);
 
         this.theta = 0;
         this.camera = new Vec3(0, 0, 0);
-        this.luminance = "`.-':_,^=;><+!rc*/z?sLTv)J7(|Fi{C}fI31tlu[neoZ5Yxjya]2ESwqkP6h9d4VpOGbUAKXHm8RD#$Bg0MNWQ%&@"
+        this.luminance = "`.-':_,^=;><+!rc*/z?sLTv)J7(|Fi{C}fI31tlu[neoZ5Yxjya]2ESwqkP6h9d4VpOGbUAKXHm8RD#$Bg0MNWQ%&@";
+
+        // default settings
+        this.settings = {
+            paused: false,
+            thetaX: 0,
+            thetaY: 0,
+            thetaZ: 0,
+            rotationSpeed: 5,
+            frametime: 50,
+            delta: 5,
+        };
     }
 
-    buildNextFrame(frameCount: number, settings: Settings, setSettings: React.Dispatch<React.SetStateAction<Settings>>) {
+    buildNextFrame() {
         let grid = this.createGrid(this.viewWidth, this.viewHeight);
 
-        if (!settings.paused) {
-            this.theta += (frameCount % 360) * Math.PI / 180;
-            // Commenting this section out makes the pause button work
-            setSettings({
-                ...settings,
-                thetaX: (this.theta * 180 / Math.PI) % 360
-            });
+        if (!this.settings.paused) {
+            this.theta += ((this.settings.delta % 360) * Math.PI) / 180;
+            this.updateSettings({ thetaX: ((this.theta * 180) / Math.PI) % 360 });
         }
 
         let rotX = new Matrix([
             [1, 0, 0, 0],
             [0, Math.cos(this.theta), -Math.sin(this.theta), 0],
             [0, Math.sin(this.theta), Math.cos(this.theta), 0],
-            [0, 0, 0, 0]
+            [0, 0, 0, 0],
         ]);
 
         let rotY = new Matrix([
             [Math.cos(this.theta), 0, Math.sin(this.theta), 0],
             [0, 1, 0, 0],
             [-Math.sin(this.theta), 0, Math.cos(this.theta), 0],
-            [0, 0, 0, 0]
+            [0, 0, 0, 0],
         ]);
 
         let rotZ = new Matrix([
             [Math.cos(this.theta), -Math.sin(this.theta), 0, 0],
             [Math.sin(this.theta), Math.cos(this.theta), 0, 0],
             [0, 0, 1, 0],
-            [0, 0, 0, 0]
+            [0, 0, 0, 0],
         ]);
 
         let mesh = new Mesh();
@@ -160,7 +119,6 @@ export default class Renderer {
         //let triangles1: Triangle[] = new Array<Triangle>();
 
         for (let i = 0; i < mesh.triangles.length; i++) {
-
             let triProjected: Triangle = new Triangle(),
                 triTranslated: Triangle = new Triangle(),
                 triRotatedX: Triangle = new Triangle(),
@@ -173,13 +131,13 @@ export default class Renderer {
 
             triangle.v0.x *= mult;
             triangle.v0.y *= mult;
-            triangle.v0.z *= mult
-            triangle.v1.x *= mult
-            triangle.v1.y *= mult
-            triangle.v1.z *= mult
-            triangle.v2.x *= mult
-            triangle.v2.y *= mult
-            triangle.v2.z *= mult
+            triangle.v0.z *= mult;
+            triangle.v1.x *= mult;
+            triangle.v1.y *= mult;
+            triangle.v1.z *= mult;
+            triangle.v2.x *= mult;
+            triangle.v2.y *= mult;
+            triangle.v2.z *= mult;
 
             this.matMul(triangle.v0, triRotatedX.v0, rotX);
             this.matMul(triangle.v1, triRotatedX.v1, rotX);
@@ -199,7 +157,9 @@ export default class Renderer {
             triTranslated.v2.z = triRotatedXYZ.v2.z + 3.0;
 
             // Use Cross-Product to get surface normal
-            let normal = new Vec3(), line1 = new Vec3(), line2 = new Vec3();
+            let normal = new Vec3(),
+                line1 = new Vec3(),
+                line2 = new Vec3();
             line1.x = triTranslated.v1.x - triTranslated.v0.x;
             line1.y = triTranslated.v1.y - triTranslated.v0.y;
             line1.z = triTranslated.v1.z - triTranslated.v0.z;
@@ -214,19 +174,26 @@ export default class Renderer {
 
             //It's normally normal to normalise the normal
             let l = Math.sqrt(normal.x * normal.x + normal.y * normal.y + normal.z * normal.z);
-            normal.x /= l; normal.y /= l; normal.z /= l;
+            normal.x /= l;
+            normal.y /= l;
+            normal.z /= l;
 
-            if (normal.x * (triTranslated.v0.x - this.camera.x) +
-                normal.y * (triTranslated.v0.y - this.camera.y) +
-                normal.z * (triTranslated.v0.z - this.camera.z) < 0) {
-
+            if (
+                normal.x * (triTranslated.v0.x - this.camera.x) +
+                    normal.y * (triTranslated.v0.y - this.camera.y) +
+                    normal.z * (triTranslated.v0.z - this.camera.z) <
+                0
+            ) {
                 this.matMul(triTranslated.v0, triProjected.v0, this.projMatrix);
                 this.matMul(triTranslated.v1, triProjected.v1, this.projMatrix);
                 this.matMul(triTranslated.v2, triProjected.v2, this.projMatrix);
 
-                triProjected.v0.x += 1.0; triProjected.v0.y += 1;
-                triProjected.v1.x += 1.0; triProjected.v1.y += 1;
-                triProjected.v2.x += 1.0; triProjected.v2.y += 1;
+                triProjected.v0.x += 1.0;
+                triProjected.v0.y += 1;
+                triProjected.v1.x += 1.0;
+                triProjected.v1.y += 1;
+                triProjected.v2.x += 1.0;
+                triProjected.v2.y += 1;
                 triProjected.v0.x *= 0.5 * this.viewWidth;
                 triProjected.v0.y *= 0.5 * this.viewHeight;
                 triProjected.v1.x *= 0.5 * this.viewWidth;
@@ -235,8 +202,12 @@ export default class Renderer {
                 triProjected.v2.y *= 0.5 * this.viewHeight;
 
                 let light_direction: Vec3 = new Vec3(0, 0, -1);
-                let l = Math.sqrt(light_direction.x * light_direction.x + light_direction.y * light_direction.y + light_direction.z * light_direction.z);
-                light_direction.x /= l; light_direction.y /= l; light_direction.z /= l;
+                let l = Math.sqrt(
+                    light_direction.x * light_direction.x + light_direction.y * light_direction.y + light_direction.z * light_direction.z
+                );
+                light_direction.x /= l;
+                light_direction.y /= l;
+                light_direction.z /= l;
 
                 let dp = normal.x * light_direction.x + normal.y * light_direction.y + normal.z * light_direction.z;
 
@@ -264,7 +235,7 @@ export default class Renderer {
         for (let y = 0; y < height; y++) {
             const row: string[] = [];
             for (let x = 0; x < width; x++) {
-                row.push(' ');
+                row.push(" ");
             }
             grid.push(row);
         }
@@ -272,7 +243,7 @@ export default class Renderer {
     }
 
     private gridToString(grid: string[][]): string {
-        return grid.map(row => row.join('')).join('\n');
+        return grid.map((row) => row.join("")).join("\n");
     }
 
     private matMul(i: Vec3, o: Vec3, m: Matrix) {
@@ -282,7 +253,9 @@ export default class Renderer {
         let w = i.x * m.arr[0][3] + i.y * m.arr[1][3] + i.z * m.arr[2][3] + m.arr[3][3];
 
         if (w !== 0) {
-            o.x /= w; o.y /= w; o.z /= w;
+            o.x /= w;
+            o.y /= w;
+            o.z /= w;
         }
     }
 
@@ -321,5 +294,9 @@ export default class Renderer {
 
     private edgeFunction(a: Vec2, b: Vec2, c: Vec2): number {
         return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
+    }
+
+    updateSettings(newSettings: { [key: string]: any }) {
+        this.settings = { ...this.settings, ...newSettings };
     }
 }

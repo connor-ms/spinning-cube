@@ -1,21 +1,17 @@
 import { useEffect, useState } from "react";
-import Renderer from "../render";
-import { Settings } from "./Settings";
+import { useRenderer } from "./RenderContext";
 import "./View.css"
 
-export default function View({ settings, setSettings }: { settings: Settings, setSettings: React.Dispatch<React.SetStateAction<Settings>> }) {
+export default function View() {
+    const { renderer } = useRenderer();
     const [frame, setFrame] = useState<string>("");
 
-    let renderer = new Renderer(75, 75);
-
     useEffect(() => {
-        const interval = setInterval(() => setFrame(renderer.buildNextFrame(5, settings, setSettings)), 50);
+        const interval = setInterval(() => setFrame(renderer.buildNextFrame()), renderer.settings.frametime);
         return () => {
             clearInterval(interval);
         };
-    }, []);
+    }, [renderer]);
 
-    return (
-        <textarea className="View" value={frame} spellCheck="false"></textarea>
-    )
+    return <textarea className="View" value={frame} spellCheck="false"></textarea>;
 }
