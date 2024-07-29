@@ -1,10 +1,10 @@
 import { Settings } from "./components/Settings";
 
-class Vec2 {
+export class Vec2 {
     constructor(public x: number = 0, public y: number = 0) {}
 }
 
-class Vec3 {
+export class Vec3 {
     constructor(public x: number = 0, public y: number = 0, public z: number = 0) {}
 }
 
@@ -48,9 +48,17 @@ class Mesh {
     }
 }
 
+function toRad(angle: number) {
+    return ((angle % 360) * Math.PI) / 180;
+}
+
+function addAndWrap(value: number, increment: number, maxValue: number = 360) {
+    return (value + increment) % (maxValue + 1);
+}
+
 export default class Renderer {
     public projMatrix: Matrix;
-    public theta: number;
+    public cubeRotation: Vec3;
     public camera: Vec3;
     public settings: Settings;
     private luminance: string;
@@ -69,16 +77,15 @@ export default class Renderer {
             [0, (-fFar * fNear) / (fFar - fNear), 0, 0],
         ]);
 
-        this.theta = 0;
-        this.camera = new Vec3(0, 0, 0);
+        this.cubeRotation = new Vec3();
+        this.camera = new Vec3();
+
         this.luminance = "`.-':_,^=;><+!rc*/z?sLTv)J7(|Fi{C}fI31tlu[neoZ5Yxjya]2ESwqkP6h9d4VpOGbUAKXHm8RD#$Bg0MNWQ%&@";
 
         // default settings
         this.settings = {
             paused: false,
-            thetaX: 0,
-            thetaY: 0,
-            thetaZ: 0,
+            step: new Vec3(3, 2, 1),
             rotationSpeed: 5,
             frametime: 50,
             delta: 5,
@@ -89,27 +96,28 @@ export default class Renderer {
         let grid = this.createGrid(this.viewWidth, this.viewHeight);
 
         if (!this.settings.paused) {
-            this.theta += ((this.settings.delta % 360) * Math.PI) / 180;
-            this.updateSettings({ thetaX: ((this.theta * 180) / Math.PI) % 360 });
+            this.cubeRotation.x = addAndWrap(this.cubeRotation.x, this.settings.step.x);
+            this.cubeRotation.y = addAndWrap(this.cubeRotation.y, this.settings.step.y);
+            this.cubeRotation.z = addAndWrap(this.cubeRotation.z, this.settings.step.z);
         }
 
         let rotX = new Matrix([
             [1, 0, 0, 0],
-            [0, Math.cos(this.theta), -Math.sin(this.theta), 0],
-            [0, Math.sin(this.theta), Math.cos(this.theta), 0],
+            [0, Math.cos(toRad(this.cubeRotation.x)), -Math.sin(toRad(this.cubeRotation.x)), 0],
+            [0, Math.sin(toRad(this.cubeRotation.x)), Math.cos(toRad(this.cubeRotation.x)), 0],
             [0, 0, 0, 0],
         ]);
 
         let rotY = new Matrix([
-            [Math.cos(this.theta), 0, Math.sin(this.theta), 0],
+            [Math.cos(toRad(this.cubeRotation.y)), 0, Math.sin(toRad(this.cubeRotation.y)), 0],
             [0, 1, 0, 0],
-            [-Math.sin(this.theta), 0, Math.cos(this.theta), 0],
+            [-Math.sin(toRad(this.cubeRotation.y)), 0, Math.cos(toRad(this.cubeRotation.y)), 0],
             [0, 0, 0, 0],
         ]);
 
         let rotZ = new Matrix([
-            [Math.cos(this.theta), -Math.sin(this.theta), 0, 0],
-            [Math.sin(this.theta), Math.cos(this.theta), 0, 0],
+            [Math.cos(toRad(this.cubeRotation.z)), -Math.sin(toRad(this.cubeRotation.z)), 0, 0],
+            [Math.sin(toRad(this.cubeRotation.z)), Math.cos(toRad(this.cubeRotation.z)), 0, 0],
             [0, 0, 1, 0],
             [0, 0, 0, 0],
         ]);
