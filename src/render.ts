@@ -64,17 +64,17 @@ export default class Renderer {
     private luminance: string;
 
     constructor(private viewWidth: number, private viewHeight: number) {
-        let fNear = 0.1;
-        let fFar = 1000;
-        let fFov = 90;
-        let fAspectRatio = viewWidth / viewHeight;
-        let fFovRad = 1.0 / Math.tan(((fFov * 0.5) / 180) * Math.PI);
+        let near = 0.1;
+        let far = 1000;
+        let fov = 90;
+        let aspectRatio = viewWidth / viewHeight;
+        let fovRad = 1.0 / Math.tan(((fov * 0.5) / 180) * Math.PI);
 
         this.projMatrix = new Matrix([
-            [fAspectRatio * fFovRad, 0, 0, 0],
-            [0, fFovRad, 0, 0],
-            [0, 0, fFar / (fFar - fNear), 1],
-            [0, (-fFar * fNear) / (fFar - fNear), 0, 0],
+            [aspectRatio * fovRad, 0, 0, 0],
+            [0, fovRad, 0, 0],
+            [0, 0, far / (far - near), 1],
+            [0, (-far * near) / (far - near), 0, 0],
         ]);
 
         this.cubeRotation = new Vec3();

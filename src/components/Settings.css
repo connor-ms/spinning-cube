@@ -1,6 +1,9 @@
 .Settings {
-    height: 100px;
     width: 500px;
     flex: 1;
     margin-right: 50px;
+}
+
+input[type="number"] {
+    width: 50px;
 }
