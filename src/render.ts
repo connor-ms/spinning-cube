@@ -88,7 +88,7 @@ export default class Renderer {
             step: new Vec3(3, 2, 1),
             rotationSpeed: 5,
             frametime: 50,
-            delta: 5,
+            distance: 5,
         };
     }
 
@@ -160,9 +160,9 @@ export default class Renderer {
             this.matMul(triRotatedXY.v2, triRotatedXYZ.v2, rotZ);
 
             triTranslated = triRotatedXYZ;
-            triTranslated.v0.z = triRotatedXYZ.v0.z + 3.0;
-            triTranslated.v1.z = triRotatedXYZ.v1.z + 3.0;
-            triTranslated.v2.z = triRotatedXYZ.v2.z + 3.0;
+            triTranslated.v0.z = triRotatedXYZ.v0.z + this.settings.distance;
+            triTranslated.v1.z = triRotatedXYZ.v1.z + this.settings.distance;
+            triTranslated.v2.z = triRotatedXYZ.v2.z + this.settings.distance;
 
             // Use Cross-Product to get surface normal
             let normal = new Vec3(),

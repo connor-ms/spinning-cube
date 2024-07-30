@@ -6,7 +6,7 @@ export interface Settings {
     step: Vec3;
     rotationSpeed: number;
     frametime: number;
-    delta: number;
+    distance: number;
 }
 
 export default function SettingsPanel() {
@@ -19,11 +19,21 @@ export default function SettingsPanel() {
 
     return (
         <div className="Settings">
-            <input type="range" min="0" max="360" value={renderer.cubeRotation.x} onChange={(event: React.ChangeEvent<HTMLInputElement>) => { renderer.cubeRotation.x = Number.parseInt(event.target.value) }} />
-            <input type="range" min="0" max="360" value={renderer.cubeRotation.y} onChange={(event: React.ChangeEvent<HTMLInputElement>) => { renderer.cubeRotation.y = Number.parseInt(event.target.value) }} />
-            <input type="range" min="0" max="360" value={renderer.cubeRotation.z} onChange={(event: React.ChangeEvent<HTMLInputElement>) => { renderer.cubeRotation.z = Number.parseInt(event.target.value) }} />
+            X: <input type="range" min="0" max="360" value={renderer.cubeRotation.x} onChange={(event: React.ChangeEvent<HTMLInputElement>) => { renderer.cubeRotation.x = Number.parseInt(event.target.value) }} />
+            <input type="number" value={renderer.settings.step.x} onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                let val = Number.parseFloat(event.target.value);
 
+                if (val === null) val = 0;
+
+                renderer.settings.step.x = Number.parseFloat(event.target.value)
+            }} />
+            Y: <input type="range" min="0" max="360" value={renderer.cubeRotation.y} onChange={(event: React.ChangeEvent<HTMLInputElement>) => { renderer.cubeRotation.y = Number.parseInt(event.target.value) }} />
+            <input type="number" value={renderer.settings.step.y} />
+            Z: <input type="range" min="0" max="360" value={renderer.cubeRotation.z} onChange={(event: React.ChangeEvent<HTMLInputElement>) => { renderer.cubeRotation.z = Number.parseInt(event.target.value) }} />
+            <input type="number" value={renderer.settings.step.z} />
             <br />
+
+            distance: <input type="range" min="1" max="10" step="0.1" value={renderer.settings.distance} onChange={(event: React.ChangeEvent<HTMLInputElement>) => { handleUpdateSettings({ distance: Number.parseFloat(event.target.value) }) }} />
 
             <button onClick={() => handleUpdateSettings({ paused: !renderer.settings.paused })}>{
                 renderer.settings.paused ? "Unpause" : "Pause"
