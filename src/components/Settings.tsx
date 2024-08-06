@@ -21,19 +21,19 @@ export default function SettingsPanel() {
     return (
         <div className="Settings">
             X: <input type="range" min="0" max="360" value={renderer.cubeRotation.x} onChange={(event: React.ChangeEvent<HTMLInputElement>) => { renderer.cubeRotation.x = Number.parseInt(event.target.value) }} />
-            ({renderer.cubeRotation.x}°)
+            <label className="range-value">({renderer.cubeRotation.x}°)</label>
             <br />
             Step: <input type="number" value={renderer.settings.step.x} onChange={(event: React.ChangeEvent<HTMLInputElement>) => { renderer.settings.step.x = Number.parseFloat(event.target.value); }} />
             <br />
 
             Y: <input type="range" min="0" max="360" value={renderer.cubeRotation.y} onChange={(event: React.ChangeEvent<HTMLInputElement>) => { renderer.cubeRotation.y = Number.parseInt(event.target.value) }} />
-            ({renderer.cubeRotation.y}°)
+            <label className="range-value">({renderer.cubeRotation.y}°)</label>
             <br />
             Step:<input type="number" value={renderer.settings.step.y} onChange={(event: React.ChangeEvent<HTMLInputElement>) => { renderer.settings.step.y = Number.parseFloat(event.target.value) }} />
             <br />
 
             Z: <input type="range" min="0" max="360" value={renderer.cubeRotation.z} onChange={(event: React.ChangeEvent<HTMLInputElement>) => { renderer.cubeRotation.z = Number.parseInt(event.target.value) }} />
-            ({renderer.cubeRotation.z}°)
+            <label className="range-value">({renderer.cubeRotation.z}°)</label>
             <br />
             Step:<input type="number" value={renderer.settings.step.z} onChange={(event: React.ChangeEvent<HTMLInputElement>) => { renderer.settings.step.z = Number.parseFloat(event.target.value) }} />
             <br />

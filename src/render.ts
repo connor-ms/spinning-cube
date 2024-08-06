@@ -1,4 +1,5 @@
 import { Settings } from "./components/Settings";
+import { Matrix } from "ts-matrix";
 
 export class Vec2 {
     constructor(public x: number = 0, public y: number = 0) {}
@@ -6,15 +7,38 @@ export class Vec2 {
 
 export class Vec3 {
     constructor(public x: number = 0, public y: number = 0, public z: number = 0) {}
+
+    multiply(val: number) {
+        this.x *= val;
+        this.y *= val;
+        this.z *= val;
+    }
 }
 
 class Triangle {
     constructor(public v0: Vec3 = new Vec3(), public v1: Vec3 = new Vec3(), public v2: Vec3 = new Vec3()) {}
+
+    toMatrix() {
+        return new Matrix(4, 4, [
+            [this.v0.x, this.v0.y, this.v0.z, 0],
+            [this.v1.x, this.v1.y, this.v1.z, 0],
+            [this.v2.x, this.v2.y, this.v2.z, 0],
+            [0, 0, 0, 0],
+        ]);
+    }
 }
 
-class Matrix {
-    constructor(public arr: number[][]) {}
-}
+// class Matrix {
+//     public columns: number;
+
+//     constructor(public arr: number[][]) {
+//         this.columns = arr.length;
+//     }
+
+//     mult(other: Matrix) {
+
+//     }
+// }
 
 class Mesh {
     public triangles: Triangle[];
@@ -70,7 +94,7 @@ export default class Renderer {
         let aspectRatio = viewWidth / viewHeight;
         let fovRad = 1.0 / Math.tan(((fov * 0.5) / 180) * Math.PI);
 
-        this.projMatrix = new Matrix([
+        this.projMatrix = new Matrix(4, 4, [
             [aspectRatio * fovRad, 0, 0, 0],
             [0, fovRad, 0, 0],
             [0, 0, far / (far - near), 1],
@@ -101,21 +125,21 @@ export default class Renderer {
             this.cubeRotation.z = addAndWrap(this.cubeRotation.z, this.settings.step.z);
         }
 
-        let rotX = new Matrix([
+        let rotX = new Matrix(4, 4, [
             [1, 0, 0, 0],
             [0, Math.cos(toRad(this.cubeRotation.x)), -Math.sin(toRad(this.cubeRotation.x)), 0],
             [0, Math.sin(toRad(this.cubeRotation.x)), Math.cos(toRad(this.cubeRotation.x)), 0],
             [0, 0, 0, 0],
         ]);
 
-        let rotY = new Matrix([
+        let rotY = new Matrix(4, 4, [
             [Math.cos(toRad(this.cubeRotation.y)), 0, Math.sin(toRad(this.cubeRotation.y)), 0],
             [0, 1, 0, 0],
             [-Math.sin(toRad(this.cubeRotation.y)), 0, Math.cos(toRad(this.cubeRotation.y)), 0],
             [0, 0, 0, 0],
         ]);
 
-        let rotZ = new Matrix([
+        let rotZ = new Matrix(4, 4, [
             [Math.cos(toRad(this.cubeRotation.z)), -Math.sin(toRad(this.cubeRotation.z)), 0, 0],
             [Math.sin(toRad(this.cubeRotation.z)), Math.cos(toRad(this.cubeRotation.z)), 0, 0],
             [0, 0, 1, 0],
@@ -127,112 +151,99 @@ export default class Renderer {
         //let triangles1: Triangle[] = new Array<Triangle>();
 
         for (let i = 0; i < mesh.triangles.length; i++) {
-            let triProjected: Triangle = new Triangle(),
-                triTranslated: Triangle = new Triangle(),
-                triRotatedX: Triangle = new Triangle(),
-                triRotatedXY: Triangle = new Triangle(),
-                triRotatedXYZ: Triangle = new Triangle();
+            //let triangle = mesh.triangles[i];
+            let triMat = mesh.triangles[i].toMatrix();
 
-            let triangle = mesh.triangles[i];
+            triMat = triMat.multiply(rotX);
+            triMat = triMat.multiply(rotY);
+            triMat = triMat.multiply(rotZ);
 
-            const mult = 2;
+            // triTranslated = triRotatedXYZ;
+            // triTranslated.v0.z = triRotatedXYZ.v0.z + this.settings.distance;
+            // triTranslated.v1.z = triRotatedXYZ.v1.z + this.settings.distance;
+            // triTranslated.v2.z = triRotatedXYZ.v2.z + this.settings.distance;
 
-            triangle.v0.x *= mult;
-            triangle.v0.y *= mult;
-            triangle.v0.z *= mult;
-            triangle.v1.x *= mult;
-            triangle.v1.y *= mult;
-            triangle.v1.z *= mult;
-            triangle.v2.x *= mult;
-            triangle.v2.y *= mult;
-            triangle.v2.z *= mult;
-
-            this.matMul(triangle.v0, triRotatedX.v0, rotX);
-            this.matMul(triangle.v1, triRotatedX.v1, rotX);
-            this.matMul(triangle.v2, triRotatedX.v2, rotX);
-
-            this.matMul(triRotatedX.v0, triRotatedXY.v0, rotY);
-            this.matMul(triRotatedX.v1, triRotatedXY.v1, rotY);
-            this.matMul(triRotatedX.v2, triRotatedXY.v2, rotY);
-
-            this.matMul(triRotatedXY.v0, triRotatedXYZ.v0, rotZ);
-            this.matMul(triRotatedXY.v1, triRotatedXYZ.v1, rotZ);
-            this.matMul(triRotatedXY.v2, triRotatedXYZ.v2, rotZ);
-
-            triTranslated = triRotatedXYZ;
-            triTranslated.v0.z = triRotatedXYZ.v0.z + this.settings.distance;
-            triTranslated.v1.z = triRotatedXYZ.v1.z + this.settings.distance;
-            triTranslated.v2.z = triRotatedXYZ.v2.z + this.settings.distance;
+            // todo: why is this not working?
+            // triMat.values[0][2] = triMat.at(0, 2) + this.settings.distance;
+            // triMat.values[1][2] = triMat.at(1, 2) + this.settings.distance;
+            // triMat.values[2][2] = triMat.at(2, 2) + this.settings.distance;
+            //console.log(triMat.at(0, 2));
 
             // Use Cross-Product to get surface normal
-            let normal = new Vec3(),
-                line1 = new Vec3(),
-                line2 = new Vec3();
-            line1.x = triTranslated.v1.x - triTranslated.v0.x;
-            line1.y = triTranslated.v1.y - triTranslated.v0.y;
-            line1.z = triTranslated.v1.z - triTranslated.v0.z;
+            // let normal = new Vec3(),
+            //     line1 = new Vec3(),
+            //     line2 = new Vec3();
+            // line1.x = triTranslated.v1.x - triTranslated.v0.x;
+            // line1.y = triTranslated.v1.y - triTranslated.v0.y;
+            // line1.z = triTranslated.v1.z - triTranslated.v0.z;
 
-            line2.x = triTranslated.v2.x - triTranslated.v0.x;
-            line2.y = triTranslated.v2.y - triTranslated.v0.y;
-            line2.z = triTranslated.v2.z - triTranslated.v0.z;
+            // line2.x = triTranslated.v2.x - triTranslated.v0.x;
+            // line2.y = triTranslated.v2.y - triTranslated.v0.y;
+            // line2.z = triTranslated.v2.z - triTranslated.v0.z;
 
-            normal.x = line1.y * line2.z - line1.z * line2.y;
-            normal.y = line1.z * line2.x - line1.x * line2.z;
-            normal.z = line1.x * line2.y - line1.y * line2.x;
+            // normal.x = line1.y * line2.z - line1.z * line2.y;
+            // normal.y = line1.z * line2.x - line1.x * line2.z;
+            // normal.z = line1.x * line2.y - line1.y * line2.x;
 
-            //It's normally normal to normalise the normal
-            let l = Math.sqrt(normal.x * normal.x + normal.y * normal.y + normal.z * normal.z);
-            normal.x /= l;
-            normal.y /= l;
-            normal.z /= l;
+            // //It's normally normal to normalise the normal
+            // let l = Math.sqrt(normal.x * normal.x + normal.y * normal.y + normal.z * normal.z);
+            // normal.x /= l;
+            // normal.y /= l;
+            // normal.z /= l;
 
-            if (
-                normal.x * (triTranslated.v0.x - this.camera.x) +
-                    normal.y * (triTranslated.v0.y - this.camera.y) +
-                    normal.z * (triTranslated.v0.z - this.camera.z) <
-                0
-            ) {
-                this.matMul(triTranslated.v0, triProjected.v0, this.projMatrix);
-                this.matMul(triTranslated.v1, triProjected.v1, this.projMatrix);
-                this.matMul(triTranslated.v2, triProjected.v2, this.projMatrix);
+            // if (
+            //     normal.x * (triTranslated.v0.x - this.camera.x) +
+            //         normal.y * (triTranslated.v0.y - this.camera.y) +
+            //         normal.z * (triTranslated.v0.z - this.camera.z) <
+            //     0
+            // ) {
+            //let temp = triTranslated.toMatrix();
+            triMat = triMat.multiply(this.projMatrix);
 
-                triProjected.v0.x += 1.0;
-                triProjected.v0.y += 1;
-                triProjected.v1.x += 1.0;
-                triProjected.v1.y += 1;
-                triProjected.v2.x += 1.0;
-                triProjected.v2.y += 1;
-                triProjected.v0.x *= 0.5 * this.viewWidth;
-                triProjected.v0.y *= 0.5 * this.viewHeight;
-                triProjected.v1.x *= 0.5 * this.viewWidth;
-                triProjected.v1.y *= 0.5 * this.viewHeight;
-                triProjected.v2.x *= 0.5 * this.viewWidth;
-                triProjected.v2.y *= 0.5 * this.viewHeight;
+            triMat.values[0][0] += 1;
+            triMat.values[0][1] += 1;
+            triMat.values[1][0] += 1;
+            triMat.values[1][1] += 1;
+            triMat.values[2][0] += 1;
+            triMat.values[2][1] += 1;
+            triMat.values[0][0] *= 0.5 * this.viewWidth;
+            triMat.values[0][1] *= 0.5 * this.viewHeight;
+            triMat.values[1][0] *= 0.5 * this.viewWidth;
+            triMat.values[1][1] *= 0.5 * this.viewHeight;
+            triMat.values[2][0] *= 0.5 * this.viewWidth;
+            triMat.values[2][1] *= 0.5 * this.viewHeight;
+            triMat.values[0][2] = triMat.at(0, 2) + this.settings.distance;
+            triMat.values[1][2] = triMat.at(1, 2) + this.settings.distance;
+            triMat.values[2][2] = triMat.at(2, 2) + this.settings.distance;
 
-                let light_direction: Vec3 = new Vec3(0, 0, -1);
-                let l = Math.sqrt(
-                    light_direction.x * light_direction.x + light_direction.y * light_direction.y + light_direction.z * light_direction.z
-                );
-                light_direction.x /= l;
-                light_direction.y /= l;
-                light_direction.z /= l;
+            // let light_direction: Vec3 = new Vec3(0, 0, -1);
+            // let l = Math.sqrt(light_direction.x * light_direction.x + light_direction.y * light_direction.y + light_direction.z * light_direction.z);
+            // light_direction.x /= l;
+            // light_direction.y /= l;
+            // light_direction.z /= l;
 
-                let dp = normal.x * light_direction.x + normal.y * light_direction.y + normal.z * light_direction.z;
+            // let dp = normal.x * light_direction.x + normal.y * light_direction.y + normal.z * light_direction.z;
 
-                let index = Math.floor(dp * (this.luminance.length - 1));
-                let char = this.luminance.charAt(index);
+            // let index = Math.floor(dp * (this.luminance.length - 1));
+            // let char = this.luminance.charAt(index);
 
-                // let char: string;
+            let char: string;
 
-                // if (i === 0 || i === 1) char = "M";
-                // else if (i === 2 || i === 3) char = "*";
-                // else if (i === 4 || i === 5) char = "W";
-                // else if (i === 6 || i === 7) char = "-";
-                // else if (i === 8 || i === 9) char = "_";
-                // else char = "6"
+            if (i === 0 || i === 1) char = "M";
+            else if (i === 2 || i === 3) char = "*";
+            else if (i === 4 || i === 5) char = "W";
+            else if (i === 6 || i === 7) char = "-";
+            else if (i === 8 || i === 9) char = "_";
+            else char = "6";
 
-                this.rasterizeTriangle(triProjected, grid, char);
-            }
+            let triProjected = new Triangle(
+                new Vec3(triMat.at(0, 0), triMat.at(0, 1), triMat.at(0, 2)),
+                new Vec3(triMat.at(1, 0), triMat.at(1, 1), triMat.at(1, 2)),
+                new Vec3(triMat.at(2, 0), triMat.at(2, 1), triMat.at(2, 2))
+            );
+
+            this.rasterizeTriangle(triProjected, grid, char);
+            //}
         }
 
         return this.gridToString(grid);
@@ -254,18 +265,18 @@ export default class Renderer {
         return grid.map((row) => row.join("")).join("\n");
     }
 
-    private matMul(i: Vec3, o: Vec3, m: Matrix) {
-        o.x = i.x * m.arr[0][0] + i.y * m.arr[1][0] + i.z * m.arr[2][0] + m.arr[3][0];
-        o.y = i.x * m.arr[0][1] + i.y * m.arr[1][1] + i.z * m.arr[2][1] + m.arr[3][1];
-        o.z = i.x * m.arr[0][2] + i.y * m.arr[1][2] + i.z * m.arr[2][2] + m.arr[3][2];
-        let w = i.x * m.arr[0][3] + i.y * m.arr[1][3] + i.z * m.arr[2][3] + m.arr[3][3];
+    // private matMul(i: Vec3, o: Vec3, m: Matrix) {
+    //     o.x = i.x * m.arr[0][0] + i.y * m.arr[1][0] + i.z * m.arr[2][0] + m.arr[3][0];
+    //     o.y = i.x * m.arr[0][1] + i.y * m.arr[1][1] + i.z * m.arr[2][1] + m.arr[3][1];
+    //     o.z = i.x * m.arr[0][2] + i.y * m.arr[1][2] + i.z * m.arr[2][2] + m.arr[3][2];
+    //     let w = i.x * m.arr[0][3] + i.y * m.arr[1][3] + i.z * m.arr[2][3] + m.arr[3][3];
 
-        if (w !== 0) {
-            o.x /= w;
-            o.y /= w;
-            o.z /= w;
-        }
-    }
+    //     if (w !== 0) {
+    //         o.x /= w;
+    //         o.y /= w;
+    //         o.z /= w;
+    //     }
+    // }
 
     private rasterizeTriangle(triangle: Triangle, grid: string[][], char: string): void {
         let minX = Math.max(0, Math.floor(Math.min(triangle.v0.x, triangle.v1.x, triangle.v2.x)));
