@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/spinning-cube/static/css/main.53091c75.css",
+    "main.js": "/spinning-cube/static/js/main.cdad9aea.js",
+    "static/js/453.888c6743.chunk.js": "/spinning-cube/static/js/453.888c6743.chunk.js",
+    "index.html": "/spinning-cube/index.html",
+    "main.53091c75.css.map": "/spinning-cube/static/css/main.53091c75.css.map",
+    "main.cdad9aea.js.map": "/spinning-cube/static/js/main.cdad9aea.js.map",
+    "453.888c6743.chunk.js.map": "/spinning-cube/static/js/453.888c6743.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.53091c75.css",
+    "static/js/main.cdad9aea.js"
+  ]
+}
