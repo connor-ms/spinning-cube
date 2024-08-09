@@ -30,7 +30,12 @@ export default function SettingsPanel() {
             X: <input type="range" min="0" max="360" value={renderer.cubeRotation.x} onChange={(event: React.ChangeEvent<HTMLInputElement>) => { renderer.cubeRotation.x = Number.parseInt(event.target.value) }} />
             <label className="range-value">({renderer.cubeRotation.x}°)</label>
             <br />
-            Step: <input type="number" value={renderer.settings.step.x} onChange={(event: React.ChangeEvent<HTMLInputElement>) => { renderer.settings.step.x = Number.parseFloat(event.target.value); }} />
+            Step: <input type="number" value={renderer.settings.step.x} onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                if (event.target.value !== "")
+                    renderer.settings.step.x = Number.parseFloat(event.target.value);
+                else
+                    renderer.settings.step.x = 0;
+            }} />
             <br />
 
             Y: <input type="range" min="0" max="360" value={renderer.cubeRotation.y} onChange={(event: React.ChangeEvent<HTMLInputElement>) => { renderer.cubeRotation.y = Number.parseInt(event.target.value) }} />

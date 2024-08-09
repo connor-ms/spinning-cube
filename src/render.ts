@@ -110,7 +110,6 @@ export default class Renderer {
 
     buildNextFrame() {
         let startTime = performance.now();
-
         let grid = this.createGrid(this.settings.viewSize.x, this.settings.viewSize.y);
 
         if (!this.settings.paused) {
@@ -240,11 +239,8 @@ export default class Renderer {
             //}
         }
 
-        let ret = this.gridToString(grid);
-
+        this.curFrame = this.gridToString(grid);
         this.settings.execTime = performance.now() - startTime;
-
-        this.curFrame = ret;
     }
 
     private createGrid(width: number, height: number): string[][] {
