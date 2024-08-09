@@ -1,19 +1,6 @@
 import { Settings } from "./components/Settings";
 import { Matrix } from "ts-matrix";
-
-export class Vec2 {
-    constructor(public x: number = 0, public y: number = 0) {}
-}
-
-export class Vec3 {
-    constructor(public x: number = 0, public y: number = 0, public z: number = 0) {}
-
-    multiply(val: number) {
-        this.x *= val;
-        this.y *= val;
-        this.z *= val;
-    }
-}
+import { Vec2, Vec3 } from "./util/vector";
 
 class Triangle {
     constructor(public v0: Vec3 = new Vec3(), public v1: Vec3 = new Vec3(), public v2: Vec3 = new Vec3()) {}
@@ -27,18 +14,6 @@ class Triangle {
         ]);
     }
 }
-
-// class Matrix {
-//     public columns: number;
-
-//     constructor(public arr: number[][]) {
-//         this.columns = arr.length;
-//     }
-
-//     mult(other: Matrix) {
-
-//     }
-// }
 
 class Mesh {
     public triangles: Triangle[];
@@ -81,17 +56,32 @@ function addAndWrap(value: number, increment: number, maxValue: number = 360) {
 }
 
 export default class Renderer {
+    public frame: string;
     public projMatrix: Matrix;
     public cubeRotation: Vec3;
     public camera: Vec3;
     public settings: Settings;
     private luminance: string;
 
-    constructor(private viewWidth: number, private viewHeight: number) {
+    constructor() {
+        // default settings
+        this.settings = {
+            viewSize: new Vec2(500, 500),
+            fontSize: 10,
+            paused: false,
+            step: new Vec3(3, 2, 1),
+            rotationSpeed: 5,
+            frametime: 50,
+            distance: 5,
+            execTime: 0,
+        };
+
+        this.frame = this.gridToString(this.createGrid(this.settings.viewSize.x, this.settings.viewSize.y));
+
         let near = 0.1;
         let far = 1000;
         let fov = 90;
-        let aspectRatio = viewWidth / viewHeight;
+        let aspectRatio = this.settings.viewSize.x / this.settings.viewSize.y;
         let fovRad = 1.0 / Math.tan(((fov * 0.5) / 180) * Math.PI);
 
         this.projMatrix = new Matrix(4, 4, [
@@ -105,19 +95,15 @@ export default class Renderer {
         this.camera = new Vec3();
 
         this.luminance = "`.-':_,^=;><+!rc*/z?sLTv)J7(|Fi{C}fI31tlu[neoZ5Yxjya]2ESwqkP6h9d4VpOGbUAKXHm8RD#$Bg0MNWQ%&@";
-
-        // default settings
-        this.settings = {
-            paused: false,
-            step: new Vec3(3, 2, 1),
-            rotationSpeed: 5,
-            frametime: 50,
-            distance: 5,
-        };
     }
 
     buildNextFrame() {
-        let grid = this.createGrid(this.viewWidth, this.viewHeight);
+        let startTime = performance.now();
+
+        this.settings.viewSize.x = (500 / this.settings.fontSize) * 1.68;
+        this.settings.viewSize.y = (500 / this.settings.fontSize) * 1.68;
+
+        let grid = this.createGrid(this.settings.viewSize.x, this.settings.viewSize.y);
 
         if (!this.settings.paused) {
             this.cubeRotation.x = addAndWrap(this.cubeRotation.x, this.settings.step.x);
@@ -206,12 +192,12 @@ export default class Renderer {
             triMat.values[1][1] += 1;
             triMat.values[2][0] += 1;
             triMat.values[2][1] += 1;
-            triMat.values[0][0] *= 0.5 * this.viewWidth;
-            triMat.values[0][1] *= 0.5 * this.viewHeight;
-            triMat.values[1][0] *= 0.5 * this.viewWidth;
-            triMat.values[1][1] *= 0.5 * this.viewHeight;
-            triMat.values[2][0] *= 0.5 * this.viewWidth;
-            triMat.values[2][1] *= 0.5 * this.viewHeight;
+            triMat.values[0][0] *= 0.5 * this.settings.viewSize.x;
+            triMat.values[0][1] *= 0.5 * this.settings.viewSize.y;
+            triMat.values[1][0] *= 0.5 * this.settings.viewSize.x;
+            triMat.values[1][1] *= 0.5 * this.settings.viewSize.y;
+            triMat.values[2][0] *= 0.5 * this.settings.viewSize.x;
+            triMat.values[2][1] *= 0.5 * this.settings.viewSize.y;
             triMat.values[0][2] = triMat.at(0, 2) + this.settings.distance;
             triMat.values[1][2] = triMat.at(1, 2) + this.settings.distance;
             triMat.values[2][2] = triMat.at(2, 2) + this.settings.distance;
@@ -246,7 +232,11 @@ export default class Renderer {
             //}
         }
 
-        return this.gridToString(grid);
+        let ret = this.gridToString(grid);
+
+        this.settings.execTime = performance.now() - startTime;
+
+        this.frame = ret;
     }
 
     private createGrid(width: number, height: number): string[][] {
@@ -280,9 +270,9 @@ export default class Renderer {
 
     private rasterizeTriangle(triangle: Triangle, grid: string[][], char: string): void {
         let minX = Math.max(0, Math.floor(Math.min(triangle.v0.x, triangle.v1.x, triangle.v2.x)));
-        let maxX = Math.min(this.viewWidth - 1, Math.ceil(Math.max(triangle.v0.x, triangle.v1.x, triangle.v2.x)));
+        let maxX = Math.min(this.settings.viewSize.x - 1, Math.ceil(Math.max(triangle.v0.x, triangle.v1.x, triangle.v2.x)));
         let minY = Math.max(0, Math.floor(Math.min(triangle.v0.y, triangle.v1.y, triangle.v2.y)));
-        let maxY = Math.min(this.viewHeight - 1, Math.ceil(Math.max(triangle.v0.y, triangle.v1.y, triangle.v2.y)));
+        let maxY = Math.min(this.settings.viewSize.y - 1, Math.ceil(Math.max(triangle.v0.y, triangle.v1.y, triangle.v2.y)));
 
         for (let y = minY; y <= maxY; y++) {
             for (let x = minX; x <= maxX; x++) {
