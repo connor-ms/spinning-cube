@@ -10,5 +10,5 @@ export default function View() {
         "font-size": `${renderer.settings.fontSize}px`
     } as React.CSSProperties;
 
-    return <textarea className="View" style={dimensions} value={renderer.frame} spellCheck="false"></textarea>;
+    return <textarea className="View" style={dimensions} value={renderer.curFrame} spellCheck="false"></textarea>;
 }

@@ -51,12 +51,14 @@ function toRad(angle: number) {
     return ((angle % 360) * Math.PI) / 180;
 }
 
-function addAndWrap(value: number, increment: number, maxValue: number = 360) {
-    return (value + increment) % (maxValue + 1);
+function addAndWrap(value: number, increment: number, min: number = 0, max: number = 360) {
+    let sum = value + increment;
+    if (sum < min) sum += max;
+    return sum % (max + 1);
 }
 
 export default class Renderer {
-    public frame: string;
+    public curFrame: string;
     public projMatrix: Matrix;
     public cubeRotation: Vec3;
     public camera: Vec3;
@@ -64,19 +66,19 @@ export default class Renderer {
     private luminance: string;
 
     constructor() {
+        this.curFrame = "";
+
         // default settings
         this.settings = {
-            viewSize: new Vec2(500, 500),
+            viewSize: new Vec2(84, 84),
             fontSize: 10,
             paused: false,
-            step: new Vec3(3, 2, 1),
+            step: new Vec3(1, 1, 1),
             rotationSpeed: 5,
-            frametime: 50,
+            frametime: 15,
             distance: 5,
             execTime: 0,
         };
-
-        this.frame = this.gridToString(this.createGrid(this.settings.viewSize.x, this.settings.viewSize.y));
 
         let near = 0.1;
         let far = 1000;
@@ -97,11 +99,17 @@ export default class Renderer {
         this.luminance = "`.-':_,^=;><+!rc*/z?sLTv)J7(|Fi{C}fI31tlu[neoZ5Yxjya]2ESwqkP6h9d4VpOGbUAKXHm8RD#$Bg0MNWQ%&@";
     }
 
-    buildNextFrame() {
-        let startTime = performance.now();
+    changeResolution(step: number) {
+        this.settings.fontSize += step;
+
+        if (this.settings.fontSize === 0) this.settings.fontSize = 1;
 
         this.settings.viewSize.x = (500 / this.settings.fontSize) * 1.68;
         this.settings.viewSize.y = (500 / this.settings.fontSize) * 1.68;
+    }
+
+    buildNextFrame() {
+        let startTime = performance.now();
 
         let grid = this.createGrid(this.settings.viewSize.x, this.settings.viewSize.y);
 
@@ -236,7 +244,7 @@ export default class Renderer {
 
         this.settings.execTime = performance.now() - startTime;
 
-        this.frame = ret;
+        this.curFrame = ret;
     }
 
     private createGrid(width: number, height: number): string[][] {
@@ -269,43 +277,33 @@ export default class Renderer {
     // }
 
     private rasterizeTriangle(triangle: Triangle, grid: string[][], char: string): void {
-        let minX = Math.max(0, Math.floor(Math.min(triangle.v0.x, triangle.v1.x, triangle.v2.x)));
-        let maxX = Math.min(this.settings.viewSize.x - 1, Math.ceil(Math.max(triangle.v0.x, triangle.v1.x, triangle.v2.x)));
-        let minY = Math.max(0, Math.floor(Math.min(triangle.v0.y, triangle.v1.y, triangle.v2.y)));
-        let maxY = Math.min(this.settings.viewSize.y - 1, Math.ceil(Math.max(triangle.v0.y, triangle.v1.y, triangle.v2.y)));
+        let min = new Vec2(
+            Math.max(0, Math.floor(Math.min(triangle.v0.x, triangle.v1.x, triangle.v2.x))),
+            Math.max(0, Math.floor(Math.min(triangle.v0.y, triangle.v1.y, triangle.v2.y)))
+        );
 
-        for (let y = minY; y <= maxY; y++) {
-            for (let x = minX; x <= maxX; x++) {
+        let max = new Vec2(
+            Math.min(this.settings.viewSize.x - 1, Math.ceil(Math.max(triangle.v0.x, triangle.v1.x, triangle.v2.x))),
+            Math.min(this.settings.viewSize.y - 1, Math.ceil(Math.max(triangle.v0.y, triangle.v1.y, triangle.v2.y)))
+        );
+
+        for (let y = min.y; y <= max.y; y++) {
+            for (let x = min.x; x <= max.x; x++) {
                 const p = new Vec2(x + 0.5, y + 0.5);
                 const w0 = this.edgeFunction(triangle.v1, triangle.v2, p);
                 const w1 = this.edgeFunction(triangle.v2, triangle.v0, p);
                 const w2 = this.edgeFunction(triangle.v0, triangle.v1, p);
+
                 if (w0 <= 0 && w1 <= 0 && w2 <= 0) {
                     if (grid[y] && grid[y][x]) {
                         grid[y][x] = char;
-
-                        // if (Math.round(x) === v0.x && Math.round(y) === v0.y) {
-                        //     grid[Math.round(y)][Math.round(x)] = "0";
-                        // }
-                        // if (Math.round(x) === v1.x && Math.round(y) === v1.y) {
-                        //     grid[Math.round(y)][Math.round(x)] = "1";
-                        // }
-                        // if (Math.round(x) === v2.x && Math.round(y) === v2.y) {
-                        //     grid[Math.round(y)][Math.round(x)] = "2";
-                        // }
                     }
                 }
             }
         }
-
-        //grid[triangle.origin().y][triangle.origin().x] = "X";
     }
 
-    private edgeFunction(a: Vec2, b: Vec2, c: Vec2): number {
+    edgeFunction(a: Vec2, b: Vec2, c: Vec2): number {
         return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
-    }
-
-    updateSettings(newSettings: { [key: string]: any }) {
-        this.settings = { ...this.settings, ...newSettings };
     }
 }
