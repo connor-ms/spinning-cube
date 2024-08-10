@@ -1,12 +1,12 @@
 import { Settings } from "./components/Settings";
-import { Matrix } from "ts-matrix";
 import { Vec2, Vec3 } from "./util/vector";
+import Mat4x4 from "./util/matrix";
 
-class Triangle {
+export class Triangle {
     constructor(public v0: Vec3 = new Vec3(), public v1: Vec3 = new Vec3(), public v2: Vec3 = new Vec3()) {}
 
     toMatrix() {
-        return new Matrix(4, 4, [
+        return new Mat4x4([
             [this.v0.x, this.v0.y, this.v0.z, 0],
             [this.v1.x, this.v1.y, this.v1.z, 0],
             [this.v2.x, this.v2.y, this.v2.z, 0],
@@ -59,7 +59,7 @@ function addAndWrap(value: number, increment: number, min: number = 0, max: numb
 
 export default class Renderer {
     public curFrame: string;
-    public projMatrix: Matrix;
+    public projMatrix: Mat4x4;
     public cubeRotation: Vec3;
     public camera: Vec3;
     public settings: Settings;
@@ -86,7 +86,7 @@ export default class Renderer {
         let aspectRatio = this.settings.viewSize.x / this.settings.viewSize.y;
         let fovRad = 1.0 / Math.tan(((fov * 0.5) / 180) * Math.PI);
 
-        this.projMatrix = new Matrix(4, 4, [
+        this.projMatrix = new Mat4x4([
             [aspectRatio * fovRad, 0, 0, 0],
             [0, fovRad, 0, 0],
             [0, 0, far / (far - near), 1],
@@ -104,8 +104,9 @@ export default class Renderer {
 
         if (this.settings.fontSize === 0) this.settings.fontSize = 1;
 
-        this.settings.viewSize.x = (500 / this.settings.fontSize) * 1.68;
-        this.settings.viewSize.y = (500 / this.settings.fontSize) * 1.68;
+        // Trial and error came to the conclusion that 1.68 was the best multiplier. No idea why...
+        this.settings.viewSize.x = Math.ceil((500 / this.settings.fontSize) * 1.68);
+        this.settings.viewSize.y = Math.ceil((500 / this.settings.fontSize) * 1.68);
     }
 
     buildNextFrame() {
@@ -118,43 +119,15 @@ export default class Renderer {
             this.cubeRotation.z = addAndWrap(this.cubeRotation.z, this.settings.step.z);
         }
 
-        let rotX = new Matrix(4, 4, [
-            [1, 0, 0, 0],
-            [0, Math.cos(toRad(this.cubeRotation.x)), -Math.sin(toRad(this.cubeRotation.x)), 0],
-            [0, Math.sin(toRad(this.cubeRotation.x)), Math.cos(toRad(this.cubeRotation.x)), 0],
-            [0, 0, 0, 0],
-        ]);
-
-        let rotY = new Matrix(4, 4, [
-            [Math.cos(toRad(this.cubeRotation.y)), 0, Math.sin(toRad(this.cubeRotation.y)), 0],
-            [0, 1, 0, 0],
-            [-Math.sin(toRad(this.cubeRotation.y)), 0, Math.cos(toRad(this.cubeRotation.y)), 0],
-            [0, 0, 0, 0],
-        ]);
-
-        let rotZ = new Matrix(4, 4, [
-            [Math.cos(toRad(this.cubeRotation.z)), -Math.sin(toRad(this.cubeRotation.z)), 0, 0],
-            [Math.sin(toRad(this.cubeRotation.z)), Math.cos(toRad(this.cubeRotation.z)), 0, 0],
-            [0, 0, 1, 0],
-            [0, 0, 0, 0],
-        ]);
-
         let mesh = new Mesh();
 
-        //let triangles1: Triangle[] = new Array<Triangle>();
-
         for (let i = 0; i < mesh.triangles.length; i++) {
-            //let triangle = mesh.triangles[i];
             let triMat = mesh.triangles[i].toMatrix();
 
-            triMat = triMat.multiply(rotX);
-            triMat = triMat.multiply(rotY);
-            triMat = triMat.multiply(rotZ);
-
-            // triTranslated = triRotatedXYZ;
-            // triTranslated.v0.z = triRotatedXYZ.v0.z + this.settings.distance;
-            // triTranslated.v1.z = triRotatedXYZ.v1.z + this.settings.distance;
-            // triTranslated.v2.z = triRotatedXYZ.v2.z + this.settings.distance;
+            // Apply rotation matrices
+            triMat = triMat.multiply(Mat4x4.makeRotX(toRad(this.cubeRotation.x)));
+            triMat = triMat.multiply(Mat4x4.makeRotY(toRad(this.cubeRotation.y)));
+            triMat = triMat.multiply(Mat4x4.makeRotZ(toRad(this.cubeRotation.z)));
 
             // todo: why is this not working?
             // triMat.values[0][2] = triMat.at(0, 2) + this.settings.distance;
@@ -205,9 +178,9 @@ export default class Renderer {
             triMat.values[1][1] *= 0.5 * this.settings.viewSize.y;
             triMat.values[2][0] *= 0.5 * this.settings.viewSize.x;
             triMat.values[2][1] *= 0.5 * this.settings.viewSize.y;
-            triMat.values[0][2] = triMat.at(0, 2) + this.settings.distance;
-            triMat.values[1][2] = triMat.at(1, 2) + this.settings.distance;
-            triMat.values[2][2] = triMat.at(2, 2) + this.settings.distance;
+            // triMat.values[0][2] = triMat.at(0, 2) + this.settings.distance;
+            // triMat.values[1][2] = triMat.at(1, 2) + this.settings.distance;
+            // triMat.values[2][2] = triMat.at(2, 2) + this.settings.distance;
 
             // let light_direction: Vec3 = new Vec3(0, 0, -1);
             // let l = Math.sqrt(light_direction.x * light_direction.x + light_direction.y * light_direction.y + light_direction.z * light_direction.z);
@@ -229,12 +202,7 @@ export default class Renderer {
             else if (i === 8 || i === 9) char = "_";
             else char = "6";
 
-            let triProjected = new Triangle(
-                new Vec3(triMat.at(0, 0), triMat.at(0, 1), triMat.at(0, 2)),
-                new Vec3(triMat.at(1, 0), triMat.at(1, 1), triMat.at(1, 2)),
-                new Vec3(triMat.at(2, 0), triMat.at(2, 1), triMat.at(2, 2))
-            );
-
+            let triProjected = triMat.toTriangle();
             this.rasterizeTriangle(triProjected, grid, char);
             //}
         }
