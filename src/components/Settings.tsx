@@ -1,4 +1,4 @@
-import { Vec2, Vec3 } from '../util/vector';
+import { Vec2, Vec4 } from '../util/vector';
 import { useRenderer } from './RenderContext';
 import "./Settings.css"
 
@@ -6,7 +6,7 @@ export interface Settings {
     viewSize: Vec2;
     fontSize: number;
     paused: boolean;
-    step: Vec3;
+    step: Vec4;
     rotationSpeed: number;
     frametime: number;
     distance: number;
@@ -61,7 +61,7 @@ export default function SettingsPanel() {
             <br />
             <br />
 
-            {/* distance: <input type="range" min="1" max="10" step="0.1" value={renderer.settings.distance} onChange={(event: React.ChangeEvent<HTMLInputElement>) => { renderer.settings.distance = Number.parseFloat(event.target.value) }} /> */}
+            distance: <input type="range" min="1" max="10" step="0.1" value={renderer.settings.distance} onChange={(event: React.ChangeEvent<HTMLInputElement>) => { renderer.settings.distance = Number.parseFloat(event.target.value) }} />
 
             <button onClick={() => { renderer.settings.paused = !renderer.settings.paused }}>{
                 renderer.settings.paused ? "Unpause" : "Pause"
