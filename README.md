@@ -12,7 +12,7 @@ This is a very basic implentation of rendering a 3D cube using a textarea as the
 - [License](#license)
 
 ## Demo
-You can view a live demo [here](https://connorms.github.io/spinning-cube).
+You can view a live demo [here](https://connor-ms.github.io/spinning-cube).
 
 ## Installation
 To get started with the project, clone the repository and install the necessary dependencies:
